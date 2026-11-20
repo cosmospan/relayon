@@ -1,2 +1,6 @@
-/** Envelope encryption + KeyProvider (§11.4). Implementation lands in a later PR (see docs/RELAYON_BUILD_SPEC.md §14). */
-export const cryptoPackage = { name: "@relayon/crypto", ready: false } as const;
+export * from "./aead.js";
+export * from "./aws-kms-provider.js";
+export * from "./dek-cache.js";
+export * from "./dev-provider.js";
+export * from "./key-provider.js";
+export * from "./signed-request.js";
