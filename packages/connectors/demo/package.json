@@ -1,0 +1,20 @@
+{
+  "name": "@relayon/connector-demo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Demo connector: an in-memory fake app that proves preview/snapshot/execute/undo end to end",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {"@relayon/connector-kit":"workspace:*","@relayon/core":"workspace:*","zod":"^4.6.7"},
+  "devDependencies": { "@relayon/config": "workspace:*" }
+}

@@ -1,6 +1,6 @@
 import type { KeyObject } from "node:crypto";
 import { RelayonError } from "@relayon/core";
-import { sha256Hex, verifyRequest, type EncryptingKeyProvider } from "@relayon/crypto";
+import { verifyRequest, type EncryptingKeyProvider } from "@relayon/crypto";
 import { Hono } from "hono";
 import type pg from "pg";
 import { CREDENTIAL_FIELDS, storeCredential } from "./store.js";
@@ -25,11 +25,11 @@ export function createConnectApp(deps: ConnectDeps) {
     if (raw.length > 64 * 1024) return c.json(new RelayonError("RELAYON_INVALID_INPUT", "Body too large").toBody(), 422);
     let claims;
     try {
-      claims = verifyRequest(deps.apiPublicKey, c.req.header("x-relayon-internal") ?? "", "connect");
+      claims = verifyRequest(deps.apiPublicKey, c.req.header("x-relayon-internal") ?? "", "connect", Date.now(), raw);
     } catch {
       return c.json(new RelayonError("RELAYON_UNAUTHENTICATED", "Invalid internal request").toBody(), 401);
     }
-    if (claims.op !== "store_credential" || claims.body_sha256 !== sha256Hex(raw)) {
+    if (claims.op !== "store_credential") {
       return c.json(new RelayonError("RELAYON_FORBIDDEN", "Request not valid for this operation").toBody(), 403);
     }
     let body: { fields?: Record<string, unknown>; expires_at?: string | null };

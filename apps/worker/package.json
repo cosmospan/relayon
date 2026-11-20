@@ -24,9 +24,13 @@
     "start": "node dist/main.js"
   },
   "dependencies": {
-    "bullmq": "^6.7.8"
+    "@relayon/api": "workspace:*",
+    "bullmq": "^6.7.8",
+    "ioredis": "^5.11.1",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@relayon/config": "workspace:*"
+    "@relayon/config": "workspace:*",
+    "@types/pg": "^8.15.0"
   }
 }

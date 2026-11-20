@@ -31,23 +31,71 @@ importers:
         version: 8.73.0(eslint@10.15.0(jiti@2.7.0))(typescript@5.9.3)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+        version: 4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
 
   apps/api:
     dependencies:
       '@hono/node-server':
         specifier: ^2.1.11
         version: 2.1.11(hono@4.13.19)
+      '@relayon/authz':
+        specifier: workspace:*
+        version: link:../../packages/authz
+      '@relayon/connector-demo':
+        specifier: workspace:*
+        version: link:../../packages/connectors/demo
+      '@relayon/connector-kit':
+        specifier: workspace:*
+        version: link:../../packages/connector-kit
       '@relayon/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@relayon/crypto':
+        specifier: workspace:*
+        version: link:../../packages/crypto
+      '@relayon/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@relayon/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
+      '@relayon/net':
+        specifier: workspace:*
+        version: link:../../packages/net
+      '@relayon/policy':
+        specifier: workspace:*
+        version: link:../../packages/policy
+      bullmq:
+        specifier: ^6.7.8
+        version: 6.7.8(ioredis@5.11.1)(pg@8.23.1)
       hono:
         specifier: ^4.13.19
         version: 4.13.19
+      ioredis:
+        specifier: ^5.11.1
+        version: 5.11.1
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@relayon/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@relayon/executor':
+        specifier: workspace:*
+        version: link:../executor
+      '@relayon/ledger':
+        specifier: workspace:*
+        version: link:../../packages/ledger
+      '@relayon/vault-db':
+        specifier: workspace:*
+        version: link:../../packages/vault-db
+      '@types/pg':
+        specifier: ^8.15.0
+        version: 8.23.1
 
   apps/connect:
     dependencies:
@@ -113,6 +161,12 @@ importers:
       '@hono/node-server':
         specifier: ^2.1.11
         version: 2.1.11(hono@4.13.19)
+      '@relayon/connector-demo':
+        specifier: workspace:*
+        version: link:../../packages/connectors/demo
+      '@relayon/connector-kit':
+        specifier: workspace:*
+        version: link:../../packages/connector-kit
       '@relayon/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -150,13 +204,25 @@ importers:
 
   apps/worker:
     dependencies:
+      '@relayon/api':
+        specifier: workspace:*
+        version: link:../api
       bullmq:
         specifier: ^6.7.8
-        version: 6.7.8(pg@8.23.1)
+        version: 6.7.8(ioredis@5.11.1)(pg@8.23.1)
+      ioredis:
+        specifier: ^5.11.1
+        version: 5.11.1
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
     devDependencies:
       '@relayon/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@types/pg':
+        specifier: ^8.15.0
+        version: 8.23.1
 
   packages/authz:
     dependencies:
@@ -171,10 +237,36 @@ importers:
   packages/config: {}
 
   packages/connector-kit:
+    dependencies:
+      '@relayon/core':
+        specifier: workspace:*
+        version: link:../core
+      '@relayon/net':
+        specifier: workspace:*
+        version: link:../net
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@relayon/config':
         specifier: workspace:*
         version: link:../config
+
+  packages/connectors/demo:
+    dependencies:
+      '@relayon/connector-kit':
+        specifier: workspace:*
+        version: link:../../connector-kit
+      '@relayon/core':
+        specifier: workspace:*
+        version: link:../../core
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@relayon/config':
+        specifier: workspace:*
+        version: link:../../config
 
   packages/core:
     devDependencies:
@@ -205,11 +297,58 @@ importers:
         specifier: ^8.15.0
         version: 8.23.1
 
-  packages/ledger:
+  packages/engine:
+    dependencies:
+      '@relayon/authz':
+        specifier: workspace:*
+        version: link:../authz
+      '@relayon/connector-kit':
+        specifier: workspace:*
+        version: link:../connector-kit
+      '@relayon/core':
+        specifier: workspace:*
+        version: link:../core
+      '@relayon/crypto':
+        specifier: workspace:*
+        version: link:../crypto
+      '@relayon/db':
+        specifier: workspace:*
+        version: link:../db
+      '@relayon/ledger':
+        specifier: workspace:*
+        version: link:../ledger
+      '@relayon/policy':
+        specifier: workspace:*
+        version: link:../policy
+      '@relayon/undo':
+        specifier: workspace:*
+        version: link:../undo
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
     devDependencies:
       '@relayon/config':
         specifier: workspace:*
         version: link:../config
+      '@types/pg':
+        specifier: ^8.15.0
+        version: 8.23.1
+
+  packages/ledger:
+    dependencies:
+      '@relayon/db':
+        specifier: workspace:*
+        version: link:../db
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+    devDependencies:
+      '@relayon/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/pg':
+        specifier: ^8.15.0
+        version: 8.23.1
 
   packages/net:
     dependencies:
@@ -222,6 +361,13 @@ importers:
         version: link:../config
 
   packages/policy:
+    dependencies:
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@relayon/config':
         specifier: workspace:*
@@ -559,6 +705,9 @@ packages:
     engines: {node: '>=20.9.0'}
     cpu: [x64]
     os: [win32]
+
+  '@ioredis/commands@1.10.0':
+    resolution: {integrity: sha512-UmeW7z4LfctwoQ5wkhVzgq8tXkreED2xZGpX+Bg+zA+WJFZCT6c062AfCK/Dfk81xZnnwdhJCUMkitihRaoC2Q==}
 
   '@isaacs/nonrecursive-glob-match@1.1.0':
     resolution: {integrity: sha512-GPm/Dbvk5RLmhRnxXIa7nTpK0xtl4E0wj0MslsuNiJ1FIROU+2+9lgUC/dgF7Ey4QCWhfEsgxilMRMCdHPfDfw==}
@@ -1112,6 +1261,10 @@ packages:
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
 
+  cluster-key-slot@1.1.1:
+    resolution: {integrity: sha512-rwHwUfXL40Chm1r08yrhU3qpUvdVlgkKNeyeGPOxnW8/SyVDvgRaed/Uz54AqWNaTCAThlj6QAs3TZcKI0xDEw==}
+    engines: {node: '>=0.10.0'}
+
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
@@ -1137,6 +1290,10 @@ packages:
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
+
+  denque@2.1.0:
+    resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
+    engines: {node: '>=0.10'}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -1274,6 +1431,10 @@ packages:
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
+
+  ioredis@5.11.1:
+    resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
+    engines: {node: '>=12.22.0'}
 
   is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
@@ -1551,6 +1712,14 @@ packages:
     resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==}
     engines: {node: '>=0.10.0'}
 
+  redis-errors@1.2.0:
+    resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
+    engines: {node: '>=4'}
+
+  redis-parser@3.0.0:
+    resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
+    engines: {node: '>=4'}
+
   rolldown@1.2.19:
     resolution: {integrity: sha512-QIiV1J9d0pzN4jeeTH4sjPy0AZ6cAy2cG0ExeoE1+U8Rvj+hR3gYkokx0YbeUNGlZqiQJJ2utcETe0oKXwzsuA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1594,6 +1763,9 @@ packages:
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
+
+  standard-as-callback@2.1.0:
+    resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
 
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
@@ -1774,9 +1946,17 @@ packages:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
 
+  yaml@2.9.1:
+    resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
 snapshots:
 
@@ -2120,6 +2300,8 @@ snapshots:
 
   '@img/sharp-win32-x64@0.35.5':
     optional: true
+
+  '@ioredis/commands@1.10.0': {}
 
   '@isaacs/nonrecursive-glob-match@1.1.0': {}
 
@@ -2523,13 +2705,13 @@ snapshots:
       chai: 6.3.0
       tinyrainbow: 3.2.0
 
-  '@vitest/mocker@4.1.12(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))':
+  '@vitest/mocker@4.1.12(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:
       '@vitest/spy': 4.1.12
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)
+      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)
 
   '@vitest/pretty-format@4.1.12':
     dependencies:
@@ -2580,7 +2762,7 @@ snapshots:
     dependencies:
       balanced-match: 4.0.4
 
-  bullmq@6.7.8(pg@8.23.1):
+  bullmq@6.7.8(ioredis@5.11.1)(pg@8.23.1):
     dependencies:
       cron-parser: 5.10.6
       msgpackr: 2.1.4
@@ -2588,6 +2770,7 @@ snapshots:
       semver: 7.8.6
       tslib: 2.9.1
     optionalDependencies:
+      ioredis: 5.11.1
       pg: 8.23.1
 
   cacheable@2.5.0:
@@ -2603,6 +2786,8 @@ snapshots:
   chai@6.3.0: {}
 
   client-only@0.0.1: {}
+
+  cluster-key-slot@1.1.1: {}
 
   convert-source-map@2.0.0: {}
 
@@ -2623,6 +2808,8 @@ snapshots:
       ms: 2.1.3
 
   deep-is@0.1.4: {}
+
+  denque@2.1.0: {}
 
   detect-libc@2.1.2: {}
 
@@ -2760,6 +2947,18 @@ snapshots:
   ignore@7.0.16: {}
 
   imurmurhash@0.1.4: {}
+
+  ioredis@5.11.1:
+    dependencies:
+      '@ioredis/commands': 1.10.0
+      cluster-key-slot: 1.1.1
+      debug: 4.4.3
+      denque: 2.1.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+      standard-as-callback: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
 
   is-extglob@2.1.1: {}
 
@@ -3007,6 +3206,12 @@ snapshots:
 
   react@19.3.1: {}
 
+  redis-errors@1.2.0: {}
+
+  redis-parser@3.0.0:
+    dependencies:
+      redis-errors: 1.2.0
+
   rolldown@1.2.19:
     dependencies:
       '@oxc-project/types': 0.156.0
@@ -3081,6 +3286,8 @@ snapshots:
 
   stackback@0.0.2: {}
 
+  standard-as-callback@2.1.0: {}
+
   std-env@4.3.0: {}
 
   styled-jsx@5.1.6(react@19.3.1):
@@ -3144,7 +3351,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0):
+  vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -3155,11 +3362,12 @@ snapshots:
       '@types/node': 22.20.5
       fsevents: 2.3.3
       jiti: 2.7.0
+      yaml: 2.9.1
 
-  vitest@4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
+  vitest@4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.12
-      '@vitest/mocker': 4.1.12(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      '@vitest/mocker': 4.1.12(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       '@vitest/pretty-format': 4.1.12
       '@vitest/runner': 4.1.12
       '@vitest/snapshot': 4.1.12
@@ -3176,7 +3384,7 @@ snapshots:
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)
+      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.20.5
@@ -3196,4 +3404,8 @@ snapshots:
 
   xtend@4.0.2: {}
 
+  yaml@2.9.1: {}
+
   yocto-queue@0.1.0: {}
+
+  zod@4.6.7: {}

@@ -26,7 +26,7 @@
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests=false",
-    "migrate": "node dist/cli.js --dev-roles"
+    "migrate": "node --env-file-if-exists=../../.env dist/cli.js --dev-roles"
   },
   "dependencies": {
     "pg": "^8.23.1"

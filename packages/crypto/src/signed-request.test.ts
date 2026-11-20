@@ -20,4 +20,17 @@ describe("signed internal requests (§11.2)", () => {
     expect(() => verifyRequest(publicKey, `${forged}.${s}`, "executor")).toThrow(/signature/);
     expect(() => verifyRequest(publicKey, t, "executor", Date.now() + 31_000)).toThrow(/expired/);
   });
+
+  it("binds the exact body into the signature without putting a digest of it in the token", () => {
+    const body = JSON.stringify({ fields: { api_key: "planted-fake-secret-123" } });
+    const t = signRequest(privateKey, claims, Date.now(), body);
+    expect(verifyRequest(publicKey, t, "executor", Date.now(), body)).toMatchObject({ ...claims, body_bound: true });
+    const decoded = Buffer.from(t.split(".")[0]!, "base64url").toString("utf8");
+    expect(decoded).not.toMatch(/[0-9a-f]{64}/);
+    expect(decoded).not.toContain("planted-fake-secret-123");
+    expect(() => verifyRequest(publicKey, t, "executor", Date.now(), body + " ")).toThrow(/signature/);
+    expect(() => verifyRequest(publicKey, t, "executor")).toThrow(/body binding/);
+    const unbound = signRequest(privateKey, claims);
+    expect(() => verifyRequest(publicKey, unbound, "executor", Date.now(), body)).toThrow(/body binding/);
+  });
 });
