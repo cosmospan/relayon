@@ -1,0 +1,14 @@
+{
+  "name": "@relayon/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": ["tsconfig.base.json"],
+  "scripts": {
+    "build": "echo 'nothing to build'",
+    "dev": "echo 'nothing to run'",
+    "lint": "eslint .",
+    "typecheck": "echo 'no ts sources'",
+    "test": "vitest run"
+  }
+}

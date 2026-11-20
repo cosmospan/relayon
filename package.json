@@ -1,0 +1,32 @@
+{
+  "name": "relayon",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:security": "echo 'security suite lands with the secrets/tenant-isolation PR (spec §11.16)'",
+    "db:migrate": "pnpm --filter @relayon/db migrate",
+    "db:seed": "pnpm --filter @relayon/db seed"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.15.0",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "turbo": "^2.11.13",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^4.1.12"
+  },
+  "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  }
+}

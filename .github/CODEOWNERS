@@ -1,0 +1,7 @@
+# Security-sensitive paths need a security reviewer (spec §13.3). Replace with real handles/teams.
+/apps/executor/   @deltalark
+/apps/connect/    @deltalark
+/packages/crypto/ @deltalark
+/packages/net/    @deltalark
+/packages/authz/  @deltalark
+/packages/db/migrations/ @deltalark

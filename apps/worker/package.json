@@ -1,0 +1,32 @@
+{
+  "name": "@relayon/worker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BullMQ workers: holds, approval expiry, undo runs, outbound webhooks (no decrypt rights)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "node --watch dist/main.js",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests=false",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "bullmq": "^6.7.8"
+  },
+  "devDependencies": {
+    "@relayon/config": "workspace:*"
+  }
+}

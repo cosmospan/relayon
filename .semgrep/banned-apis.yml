@@ -1,0 +1,34 @@
+rules:
+  - id: relayon-no-eval
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "Banned by spec P3: no runtime code from outside (eval / new Function)."
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+      - pattern: Function(...)
+  - id: relayon-no-vm
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "Banned by spec P3: node:vm."
+    pattern-either:
+      - pattern: import "vm"
+      - pattern: import "node:vm"
+      - pattern: require("vm")
+      - pattern: require("node:vm")
+  - id: relayon-no-dynamic-import-of-variable
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "Banned by spec P3: dynamic import of a non-literal specifier."
+    patterns:
+      - pattern: import($X)
+      - pattern-not: import("...")
+  - id: relayon-no-raw-fetch-outside-net
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "Outbound HTTP must go through packages/net safeFetch (spec §11.9)."
+    paths:
+      exclude: ["packages/net/**", "**/*.test.ts", "apps/dashboard/**"]
+    pattern-either:
+      - pattern: fetch(...)
+      - pattern: globalThis.fetch(...)

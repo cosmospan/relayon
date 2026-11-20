@@ -1,0 +1,66 @@
+# Local development only. Credentials below are throwaway dev values.
+name: relayon
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: relayon_owner
+      POSTGRES_PASSWORD: relayon_owner
+      POSTGRES_DB: relayon
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - pg-main:/var/lib/postgresql/data
+      - ./postgres/main-init.sql:/docker-entrypoint-initdb.d/01-roles.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relayon_owner -d relayon"]
+      interval: 5s
+      retries: 10
+
+  # Separate vault DB (spec §11.4): only apps/executor and apps/connect may reach it.
+  postgres-vault:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: relayon_vault
+      POSTGRES_PASSWORD: relayon_vault
+      POSTGRES_DB: relayon_vault
+    ports: ["127.0.0.1:5433:5432"]
+    volumes:
+      - pg-vault:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relayon_vault -d relayon_vault"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["127.0.0.1:6379:6379"]
+    volumes: [redis:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports: ["127.0.0.1:9000:9000", "127.0.0.1:9001:9001"]
+    volumes: [minio:/data]
+
+  # Egress proxy (spec §11.9): blocks private/metadata IPs; allowlist in egress/acl.yaml.
+  egress:
+    image: ghcr.io/stripe/smokescreen:latest
+    command: ["--listen-ip=0.0.0.0", "--listen-port=4750", "--egress-acl-file=/etc/smokescreen/acl.yaml"]
+    ports: ["127.0.0.1:4750:4750"]
+    volumes:
+      - ./egress/acl.yaml:/etc/smokescreen/acl.yaml:ro
+
+volumes:
+  pg-main:
+  pg-vault:
+  redis:
+  minio:
