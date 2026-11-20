@@ -18,6 +18,7 @@ const write = (name, data) => {
 };
 write("master-key.hex", randomBytes(32).toString("hex"));
 write("api-key-pepper.hex", randomBytes(32).toString("hex"));
+write("snapshot-key.hex", randomBytes(32).toString("hex"));
 const { publicKey, privateKey } = generateKeyPairSync("ed25519");
 write("internal-signing.pem", privateKey.export({ type: "pkcs8", format: "pem" }));
 write("internal-signing.pub.pem", publicKey.export({ type: "spki", format: "pem" }));

@@ -20,8 +20,9 @@ export const ACTION_STATUSES = [
 export type ActionStatus = (typeof ACTION_STATUSES)[number];
 
 const TRANSITIONS: Readonly<Record<ActionStatus, readonly ActionStatus[]>> = {
-  received: ["previewed"],
-  previewed: ["blocked", "executing", "held", "pending_approval"],
+  // received/previewed → failed covers "could not preview / resolve the target" (fail closed).
+  received: ["previewed", "failed"],
+  previewed: ["blocked", "executing", "held", "pending_approval", "failed"],
   executing: ["succeeded", "failed"],
   held: ["executing", "cancelled"],
   pending_approval: ["approved", "rejected", "expired"],

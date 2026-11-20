@@ -16,6 +16,8 @@ export interface Credential {
 export interface ToolInvocation {
   op: string;
   toolId: string;
+  actionId: string;
+  connectionId: string;
   input: unknown;
   /** Extra non-secret data from the relay engine (e.g. a stored snapshot for undo). */
   params: unknown;
@@ -39,18 +41,19 @@ export interface ExecutorDeps {
   instanceId: string;
 }
 
-/** Ops that run against an action row in `executing` status. Preview may run earlier. */
+/**
+ * Which action status each op requires. Writes (`snapshot`, `execute`) only run on an action the
+ * state machine has moved to `executing`; `undo_check` reads the original, succeeded action.
+ */
 const OP_STATUS: Record<string, readonly string[]> = {
   preview: ["received", "previewed"],
   snapshot: ["executing"],
   execute: ["executing"],
-  capture_after: ["executing", "succeeded"],
-  undo_check: ["executing"],
-  undo: ["executing"],
+  undo_check: ["succeeded"],
 };
 
 const PURPOSE: Record<string, DecryptPurpose> = {
-  preview: "execute", snapshot: "execute", execute: "execute", capture_after: "execute", undo_check: "undo", undo: "undo",
+  preview: "execute", snapshot: "execute", execute: "execute", undo_check: "undo",
 };
 
 function verifyAny(signers: readonly KeyObject[], token: string): SignedClaims {
@@ -145,7 +148,7 @@ export async function handleExec(deps: ExecutorDeps, token: string, params: unkn
   }
 
   try {
-    const result = await deps.runtime.run({ op: claims.op, toolId: claims.tool_id, input: action.input, params, credential });
+    const result = await deps.runtime.run({ op: claims.op, toolId: claims.tool_id, actionId: action.id, connectionId: claims.connection_id, input: action.input, params, credential });
     // Redact before anything leaves the vault zone (§11.4 step 4), including exact secret values.
     return { result: redact(result, { secrets }) };
   } catch (err) {

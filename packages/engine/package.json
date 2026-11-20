@@ -1,0 +1,40 @@
+{
+  "name": "@relayon/engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Relay engine: classify → policy → preview → snapshot → execute/hold/approve → ledger, plus undo",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@relayon/authz": "workspace:*",
+    "@relayon/connector-kit": "workspace:*",
+    "@relayon/core": "workspace:*",
+    "@relayon/crypto": "workspace:*",
+    "@relayon/db": "workspace:*",
+    "@relayon/ledger": "workspace:*",
+    "@relayon/policy": "workspace:*",
+    "@relayon/undo": "workspace:*",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@relayon/config": "workspace:*",
+    "@types/pg": "^8.15.0"
+  }
+}

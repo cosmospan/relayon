@@ -31,7 +31,9 @@
     "@relayon/net": "workspace:*",
     "@relayon/vault-db": "workspace:*",
     "hono": "^4.13.19",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "@relayon/connector-kit": "workspace:*",
+    "@relayon/connector-demo": "workspace:*"
   },
   "devDependencies": {
     "@relayon/config": "workspace:*",

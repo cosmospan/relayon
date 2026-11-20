@@ -21,14 +21,31 @@
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests=false",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "bootstrap": "node dist/bootstrap.js"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.11",
+    "@relayon/authz": "workspace:*",
+    "@relayon/connector-demo": "workspace:*",
+    "@relayon/connector-kit": "workspace:*",
     "@relayon/core": "workspace:*",
-    "hono": "^4.13.19"
+    "@relayon/crypto": "workspace:*",
+    "@relayon/db": "workspace:*",
+    "@relayon/engine": "workspace:*",
+    "@relayon/net": "workspace:*",
+    "@relayon/policy": "workspace:*",
+    "bullmq": "^6.7.8",
+    "hono": "^4.13.19",
+    "ioredis": "^5.11.1",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@relayon/config": "workspace:*"
+    "@relayon/config": "workspace:*",
+    "@relayon/executor": "workspace:*",
+    "@relayon/ledger": "workspace:*",
+    "@relayon/vault-db": "workspace:*",
+    "@types/pg": "^8.15.0"
   }
 }

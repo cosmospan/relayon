@@ -2,6 +2,8 @@ import { createPublicKey } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { hostname } from "node:os";
 import { serve } from "@hono/node-server";
+import { ConnectorRegistry, createToolRuntime } from "@relayon/connector-kit";
+import { createDemoConnector } from "@relayon/connector-demo";
 import { DekCache, DevKeyProvider } from "@relayon/crypto";
 import pg from "pg";
 import { createExecutorApp } from "./app.js";
@@ -19,7 +21,8 @@ const app = createExecutorApp({
   vault: new pg.Pool({ connectionString: env("EXECUTOR_VAULT_DATABASE_URL") }),
   dekCache: new DekCache(keyProvider),
   trustedSigners: [createPublicKey(readFileSync(env("INTERNAL_SIGNING_PUBLIC_KEY_FILE")))],
-  runtime: { run: async () => { throw new Error("no connectors registered"); } },
+  // Connectors are reviewed code shipped in the build; nothing registers tools at runtime (P3).
+  runtime: createToolRuntime(new ConnectorRegistry().register(createDemoConnector())),
   instanceId: `${hostname()}:${process.pid}`,
 });
 const port = Number(process.env.EXECUTOR_PORT ?? 8788);

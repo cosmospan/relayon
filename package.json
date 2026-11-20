@@ -13,7 +13,9 @@
     "test": "turbo run test",
     "test:security": "turbo run test --filter=@relayon/db --filter=@relayon/vault-db --filter=@relayon/crypto --filter=@relayon/net --filter=@relayon/authz --filter=@relayon/executor",
     "db:migrate": "pnpm --filter @relayon/db --filter @relayon/vault-db run migrate",
-    "dev:keys": "node scripts/dev-keys.mjs"
+    "dev:keys": "node scripts/dev-keys.mjs",
+    "start:local": "node scripts/dev.mjs",
+    "bootstrap": "node --env-file=.env apps/api/dist/bootstrap.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

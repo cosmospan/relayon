@@ -4,6 +4,8 @@ import { ACTION_STATUSES, RelayonError, canTransition, isTerminal } from "./inde
 describe("action state machine (§4.1)", () => {
   it.each([
     ["received", "previewed"],
+    ["received", "failed"],
+    ["previewed", "failed"],
     ["previewed", "blocked"],
     ["previewed", "executing"],
     ["previewed", "held"],
