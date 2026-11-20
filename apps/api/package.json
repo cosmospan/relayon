@@ -1,0 +1,34 @@
+{
+  "name": "@relayon/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Hono server: REST /v1 and MCP /mcp",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "node --watch dist/server.js",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests=false",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.11",
+    "@relayon/core": "workspace:*",
+    "hono": "^4.13.19"
+  },
+  "devDependencies": {
+    "@relayon/config": "workspace:*"
+  }
+}

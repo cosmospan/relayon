@@ -1,0 +1,7 @@
+# Smokescreen egress ACL (dev). Production allowlists are per connector (spec §11.9).
+version: v1
+services: []
+default:
+  name: default
+  project: relayon
+  action: report
