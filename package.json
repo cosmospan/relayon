@@ -11,9 +11,9 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "test:security": "echo 'security suite lands with the secrets/tenant-isolation PR (spec §11.16)'",
-    "db:migrate": "pnpm --filter @relayon/db migrate",
-    "db:seed": "pnpm --filter @relayon/db seed"
+    "test:security": "turbo run test --filter=@relayon/db --filter=@relayon/vault-db --filter=@relayon/crypto --filter=@relayon/net --filter=@relayon/authz --filter=@relayon/executor",
+    "db:migrate": "pnpm --filter @relayon/db --filter @relayon/vault-db run migrate",
+    "dev:keys": "node scripts/dev-keys.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

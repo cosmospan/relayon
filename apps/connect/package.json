@@ -1,0 +1,39 @@
+{
+  "name": "@relayon/connect",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Connect service: credential capture, encrypt-only (GenerateDataKey), writes to the vault DB",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "node --watch dist/server.js",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.11",
+    "@relayon/core": "workspace:*",
+    "@relayon/crypto": "workspace:*",
+    "@relayon/db": "workspace:*",
+    "@relayon/vault-db": "workspace:*",
+    "hono": "^4.13.19",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@relayon/config": "workspace:*",
+    "@types/pg": "^8.15.0"
+  }
+}

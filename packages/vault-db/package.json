@@ -1,0 +1,39 @@
+{
+  "name": "@relayon/vault-db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Separate vault DB: credentials, wrapped DEKs, decrypt_log",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "migrations"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "migrate": "node dist/cli.js --dev-roles"
+  },
+  "dependencies": {
+    "pg": "^8.23.1",
+    "@relayon/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@relayon/config": "workspace:*",
+    "@types/pg": "^8.15.0"
+  }
+}
