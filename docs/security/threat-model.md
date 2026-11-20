@@ -23,7 +23,7 @@ _Last updated: core relay PR (engine, REST + MCP, policy, ledger, undo)._
 | Snapshots at rest | `packages/engine` `SnapshotSealer`: AES-256-GCM with AAD `snapshot|org|action|slot`, key from `SNAPSHOT_KEY_FILE` | Done; **key is a single local key, not KMS-wrapped yet** |
 | Sweepers (holds, approval expiry) | `relayon_due_holds` / `relayon_due_approval_expiries` security-definer functions return only ids + org ids; the worker then re-enters `withTenant` per action | Done, tested |
 | Ledger integrity | `packages/ledger`: hash chain per project, `pg_advisory_xact_lock` per project, guarded transitions `WHERE status = ANY($expected)` | Done, tested (`verifyChain`) |
-| MCP endpoint | `apps/api/src/mcp.ts`: hand-rolled stateless Streamable HTTP (JSON responses only), Origin allowlist, same API-key auth and scopes as REST | Done; **not yet tested against third-party MCP clients** |
+| MCP endpoint | `apps/api/src/mcp.ts`: hand-rolled stateless Streamable HTTP (JSON responses only), Origin allowlist, same API-key auth and scopes as REST; protocol 2026-07-28 envelope enforced (MCP-Protocol-Version / Mcp-Method / Mcp-Name must match the body, else 400) plus the 2025 dialects | Done; **not yet tested against third-party MCP clients** |
 
 ## Design decisions to review
 

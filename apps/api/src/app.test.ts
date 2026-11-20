@@ -325,6 +325,54 @@ describe("MCP endpoint (§8.1–8.2)", () => {
     expect(cancelled.body.result.structuredContent.status).toBe("cancelled");
   });
 
+  describe("protocol 2026-07-28 (stateless, no handshake)", () => {
+    const V = "2026-07-28";
+    const env = (method: string, params: J = {}) => ({ ...params, _meta: { "io.modelcontextprotocol/protocolVersion": V, "io.modelcontextprotocol/clientCapabilities": {}, "io.modelcontextprotocol/clientInfo": { name: "t", version: "1" } } });
+    const hdrs = (method: string, name?: string): Record<string, string> => ({ "mcp-protocol-version": V, "mcp-method": method, ...(name ? { "mcp-name": name } : {}) });
+
+    it("serves server/discover, tools/list with cache hints, and tools/call without initialize", async () => {
+      const d = await rpc({ jsonrpc: "2.0", id: "d1", method: "server/discover", params: env("server/discover") }, hdrs("server/discover"));
+      expect(d.status).toBe(200);
+      expect(d.body.result).toMatchObject({ resultType: "complete", supportedVersions: expect.arrayContaining([V, "2025-11-25"]), capabilities: { tools: {} }, cacheScope: "public" });
+      expect(d.body.result._meta["io.modelcontextprotocol/serverInfo"].name).toBe("relayon");
+      expect(d.body.result.ttlMs).toBeGreaterThanOrEqual(0);
+
+      const l = await rpc({ jsonrpc: "2.0", id: 2, method: "tools/list", params: env("tools/list") }, hdrs("tools/list"));
+      expect(l.body.result).toMatchObject({ resultType: "complete", cacheScope: "private" });
+      const names = l.body.result.tools.map((t: J) => t.name);
+      expect(names).toEqual([...names].sort());
+
+      const c = await rpc({ jsonrpc: "2.0", id: 3, method: "tools/call", params: env("tools/call", { name: "demo_create_record", arguments: { title: "Modern MCP" } }) }, hdrs("tools/call", "demo_create_record"));
+      expect(c.body.result).toMatchObject({ resultType: "complete", isError: false });
+      expect(c.body.result._meta.relayon.status).toBe("succeeded");
+    });
+
+    it("rejects header/body mismatches, missing envelope fields and unknown versions with 400", async () => {
+      const call = (h: Record<string, string>, params: J = env("tools/call", { name: "demo_list_records", arguments: {} })) =>
+        rpc({ jsonrpc: "2.0", id: 9, method: "tools/call", params }, h);
+      const noHeader = await call({ "mcp-method": "tools/call", "mcp-name": "demo_list_records" });
+      expect([noHeader.status, noHeader.body.error.code]).toEqual([400, -32020]);
+      const wrongName = await call(hdrs("tools/call", "relayon_undo"));
+      expect([wrongName.status, wrongName.body.error.code]).toEqual([400, -32020]);
+      const wrongMethod = await call(hdrs("tools/list", "demo_list_records"));
+      expect([wrongMethod.status, wrongMethod.body.error.code]).toEqual([400, -32020]);
+      const noCaps = await call(hdrs("tools/call", "demo_list_records"), { name: "demo_list_records", arguments: {}, _meta: { "io.modelcontextprotocol/protocolVersion": V } });
+      expect([noCaps.status, noCaps.body.error.code]).toEqual([400, -32602]);
+      const future = await rpc({ jsonrpc: "2.0", id: 10, method: "tools/list", params: { _meta: { "io.modelcontextprotocol/protocolVersion": "2099-01-01", "io.modelcontextprotocol/clientCapabilities": {} } } }, { "mcp-protocol-version": "2099-01-01", "mcp-method": "tools/list" });
+      expect(future.status).toBe(400);
+      expect(future.body.error).toMatchObject({ code: -32022, data: { requested: "2099-01-01", supported: expect.arrayContaining([V]) } });
+      const headerOnly = await rpc({ jsonrpc: "2.0", id: 11, method: "tools/list" }, hdrs("tools/list"));
+      expect([headerOnly.status, headerOnly.body.error.code]).toEqual([400, -32602]);
+    });
+
+    it("has no handshake, ping or subscriptions in the new dialect", async () => {
+      for (const m of ["initialize", "ping", "subscriptions/listen"]) {
+        const r = await rpc({ jsonrpc: "2.0", id: 12, method: m, params: env(m) }, hdrs(m));
+        expect([r.status, r.body.error.code]).toEqual([404, -32601]);
+      }
+    });
+  });
+
   it("validates Origin and auth on every request", async () => {
     expect((await rpc({ jsonrpc: "2.0", id: 1, method: "ping" }, { origin: "https://evil.example" })).status).toBe(403);
     expect((await rpc({ jsonrpc: "2.0", id: 1, method: "ping" }, { origin: "https://claude.ai" })).status).toBe(200);

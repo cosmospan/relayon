@@ -149,9 +149,15 @@ export function createApp(deps: ApiDeps) {
     } catch {
       return c.json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }, 400);
     }
-    const out = await handleMcp(relay, ctx, msg, { runId: c.req.header("relayon-run-id")?.slice(0, 200), endUser: c.req.header("relayon-end-user")?.slice(0, 200) });
-    if (out === null) return c.body(null, 202);
-    return c.json(out);
+    const out = await handleMcp(relay, ctx, msg, {
+      runId: c.req.header("relayon-run-id")?.slice(0, 200),
+      endUser: c.req.header("relayon-end-user")?.slice(0, 200),
+      protocolVersion: c.req.header("mcp-protocol-version"),
+      mcpMethod: c.req.header("mcp-method"),
+      mcpName: c.req.header("mcp-name"),
+    });
+    if (out.body === null) return c.body(null, 202);
+    return c.json(out.body, out.status as 200);
   });
 
   app.notFound((c) => c.json(new RelayonError("RELAYON_TOOL_NOT_FOUND", "Route not found").toBody(), 404));
