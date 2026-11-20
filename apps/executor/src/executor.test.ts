@@ -1,6 +1,6 @@
 import { createHash, generateKeyPairSync, randomBytes } from "node:crypto";
 import { createConnectApp } from "@relayon/connect";
-import { DekCache, DevKeyProvider, sha256Hex, signRequest } from "@relayon/crypto";
+import { DekCache, DevKeyProvider, signRequest } from "@relayon/crypto";
 import { newId, withTenant } from "@relayon/db";
 import { createTenant, setupMainDb } from "@relayon/db/testing";
 import { setupVaultDb } from "@relayon/vault-db/testing";
@@ -56,7 +56,7 @@ beforeAll(async () => {
   // Store the credential through the Connect service (encrypt-only path).
   const connect = createConnectApp({ vault: vault.connect, keyProvider, apiPublicKey: signer.publicKey });
   const body = JSON.stringify({ fields: { api_key: SECRET } });
-  const t = signRequest(signer.privateKey, { aud: "connect", org_id: tenant.orgId, project_id: tenant.projectId, connection_id: connectionId, op: "store_credential", body_sha256: sha256Hex(body) });
+  const t = signRequest(signer.privateKey, { aud: "connect", org_id: tenant.orgId, project_id: tenant.projectId, connection_id: connectionId, op: "store_credential" }, Date.now(), body);
   const res = await connect.request("/internal/credentials", { method: "POST", headers: { "x-relayon-internal": t }, body });
   expect(res.status).toBe(200);
   expect(JSON.stringify(await res.json())).not.toContain(SECRET);
@@ -119,10 +119,14 @@ describe("executor (§11.2, §11.4)", () => {
     expect((await exec(foreign)).status).toBe(401);
   });
 
-  it("connect refuses a body that does not match the signed hash", async () => {
+  it("connect refuses a body that is not the one that was signed", async () => {
     const connect = createConnectApp({ vault: vault.connect, keyProvider, apiPublicKey: signer.publicKey });
-    const t = signRequest(signer.privateKey, { aud: "connect", org_id: tenant.orgId, project_id: tenant.projectId, connection_id: connectionId, op: "store_credential", body_sha256: sha256Hex("{}") });
+    const t = signRequest(signer.privateKey, { aud: "connect", org_id: tenant.orgId, project_id: tenant.projectId, connection_id: connectionId, op: "store_credential" }, Date.now(), "{}");
     const res = await connect.request("/internal/credentials", { method: "POST", headers: { "x-relayon-internal": t }, body: JSON.stringify({ fields: { api_key: "x" } }) });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
+    // A token signed without a body cannot be used for a body-carrying request either.
+    const unbound = signRequest(signer.privateKey, { aud: "connect", org_id: tenant.orgId, project_id: tenant.projectId, connection_id: connectionId, op: "store_credential" });
+    const res2 = await connect.request("/internal/credentials", { method: "POST", headers: { "x-relayon-internal": unbound }, body: "{}" });
+    expect(res2.status).toBe(401);
   });
 });

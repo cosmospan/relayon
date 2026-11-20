@@ -1,7 +1,7 @@
 import type { KeyObject } from "node:crypto";
 import type { TenantContext } from "@relayon/authz";
 import { RelayonError } from "@relayon/core";
-import { sha256Hex, signRequest } from "@relayon/crypto";
+import { signRequest } from "@relayon/crypto";
 import type { Relay } from "@relayon/engine";
 import { compilePolicy } from "@relayon/policy";
 import { Hono, type Context } from "hono";
@@ -111,7 +111,7 @@ export function createApp(deps: ApiDeps) {
     if (conn.needs_secret && b.api_key) {
       if (!deps.connect) throw new RelayonError("RELAYON_INTERNAL", "Connect service not configured");
       const body = { fields: { api_key: b.api_key } };
-      const token = signRequest(deps.connect.signingKey, { aud: "connect", org_id: ctx.orgId, project_id: ctx.projectId, connection_id: conn.id, op: "store_credential", body_sha256: sha256Hex(JSON.stringify(body)) });
+      const token = signRequest(deps.connect.signingKey, { aud: "connect", org_id: ctx.orgId, project_id: ctx.projectId, connection_id: conn.id, op: "store_credential" }, Date.now(), JSON.stringify(body));
       const res = await deps.connect.post("/internal/credentials", { "x-relayon-internal": token }, body);
       if (res.status !== 200) throw new RelayonError("RELAYON_INTERNAL", "Could not store the credential");
       await relay.activateConnection(ctx, conn.id);

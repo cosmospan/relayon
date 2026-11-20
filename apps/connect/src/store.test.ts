@@ -1,5 +1,5 @@
 import { generateKeyPairSync, randomBytes } from "node:crypto";
-import { DevKeyProvider, sha256Hex, signRequest } from "@relayon/crypto";
+import { DevKeyProvider, signRequest } from "@relayon/crypto";
 import { describe, expect, it, vi } from "vitest";
 import { createConnectApp, credentialContext, storeCredential } from "./index.js";
 
@@ -22,7 +22,7 @@ describe("connect", () => {
     const app = createConnectApp({ vault: fakePool, keyProvider: new DevKeyProvider(randomBytes(32)), apiPublicKey: signer.publicKey });
     expect((await app.request("/internal/credentials", { method: "POST", body: "{}" })).status).toBe(401);
     const body = JSON.stringify({ fields: { password: "x" } });
-    const t = signRequest(signer.privateKey, { aud: "connect", org_id: "org_a", project_id: "prj_a", connection_id: "con_a", op: "store_credential", body_sha256: sha256Hex(body) });
+    const t = signRequest(signer.privateKey, { aud: "connect", org_id: "org_a", project_id: "prj_a", connection_id: "con_a", op: "store_credential" }, Date.now(), body);
     expect((await app.request("/internal/credentials", { method: "POST", headers: { "x-relayon-internal": t }, body })).status).toBe(422);
   });
 });

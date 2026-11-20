@@ -15,7 +15,8 @@ export interface SignedClaims {
   action_id?: string;
   tool_id?: string;
   input_hash?: string;
-  body_sha256?: string;
+  /** When true, the signature also covers the exact request body bytes. */
+  body_bound?: boolean;
   exp: number;
   nonce: string;
 }
@@ -26,10 +27,28 @@ export function sha256Hex(data: string | Buffer): string {
   return createHash("sha256").update(data).digest("hex");
 }
 
-export function signRequest(privateKey: KeyObject, claims: Omit<SignedClaims, "v" | "exp" | "nonce">, now = Date.now()): string {
-  const full: SignedClaims = { v: 1, ...claims, exp: Math.floor(now / 1000) + MAX_LIFETIME_S, nonce: randomBytes(16).toString("base64url") };
+function signedBytes(payload: Buffer, body: string | Buffer | undefined): Buffer {
+  if (body === undefined) return payload;
+  // Domain-separated: payload, a zero byte, then the exact body. Ed25519 signs the bytes directly, so no
+  // digest of the (possibly secret-bearing) body ever appears in the token.
+  return Buffer.concat([payload, Buffer.from([0]), typeof body === "string" ? Buffer.from(body, "utf8") : body]);
+}
+
+export function signRequest(
+  privateKey: KeyObject,
+  claims: Omit<SignedClaims, "v" | "exp" | "nonce" | "body_bound">,
+  now = Date.now(),
+  body?: string | Buffer,
+): string {
+  const full: SignedClaims = {
+    v: 1,
+    ...claims,
+    ...(body !== undefined ? { body_bound: true } : {}),
+    exp: Math.floor(now / 1000) + MAX_LIFETIME_S,
+    nonce: randomBytes(16).toString("base64url"),
+  };
   const payload = Buffer.from(JSON.stringify(full));
-  const sig = sign(null, payload, privateKey);
+  const sig = sign(null, signedBytes(payload, body), privateKey);
   return `${payload.toString("base64url")}.${sig.toString("base64url")}`;
 }
 
@@ -40,18 +59,26 @@ export class SignedRequestError extends Error {
   }
 }
 
-export function verifyRequest(publicKey: KeyObject, token: string, aud: SignedClaims["aud"], now = Date.now()): SignedClaims {
+export function verifyRequest(
+  publicKey: KeyObject,
+  token: string,
+  aud: SignedClaims["aud"],
+  now = Date.now(),
+  body?: string | Buffer,
+): SignedClaims {
   const parts = token.split(".");
   if (parts.length !== 2) throw new SignedRequestError("malformed token");
   const payload = Buffer.from(parts[0]!, "base64url");
   const sig = Buffer.from(parts[1]!, "base64url");
-  if (!verify(null, payload, publicKey, sig)) throw new SignedRequestError("bad signature");
   let claims: SignedClaims;
   try {
     claims = JSON.parse(payload.toString("utf8")) as SignedClaims;
   } catch {
     throw new SignedRequestError("malformed payload");
   }
+  // The caller decides whether a body is expected; the token cannot opt out of body binding.
+  if ((claims.body_bound === true) !== (body !== undefined)) throw new SignedRequestError("body binding mismatch");
+  if (!verify(null, signedBytes(payload, body), publicKey, sig)) throw new SignedRequestError("bad signature");
   if (claims.v !== 1 || claims.aud !== aud) throw new SignedRequestError("wrong audience");
   const nowS = Math.floor(now / 1000);
   if (typeof claims.exp !== "number" || claims.exp < nowS) throw new SignedRequestError("expired");
