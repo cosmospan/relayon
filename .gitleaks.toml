@@ -4,7 +4,7 @@ useDefault = true
 
 [allowlist]
 description = "Example values in the build spec"
-regexTarget = "line"
+regexTarget = "secret"
 regexes = [
-  '''^Idempotency-Key: 6f1c2a90-2b7e-4c1d-9d1f-0d7d4c8e9a11$''',
+  '''^6f1c2a90-2b7e-4c1d-9d1f-0d7d4c8e9a11$''',
 ]
